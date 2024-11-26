@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id "io.freefair.lombok" version "8.11"
+}
+
+group = 'com.omar'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.mindrot:jbcrypt:0.4'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation group: 'com.toedter', name: 'jcalendar', version: '1.4'
+    implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -24,9 +24,10 @@ public class BusquedaVueloFrame extends JFrame {
     private final AeropuertoService aeropuertoService;
     private final VueloService vueloService;
 
-    public BusquedaVueloFrame(AeropuertoService aeropuertoService, VueloService vueloService) {
-        this.aeropuertoService = aeropuertoService;
-        this.vueloService = vueloService;
+    public BusquedaVueloFrame() throws SQLException {
+        ServiceFactory serviceFactory = ServiceFactory.getInstance();
+        this.aeropuertoService = serviceFactory.getAeropuertoService();
+        this.vueloService = serviceFactory.getVueloService();
         setTitle("Búsqueda de Vuelos");
         initComponents();
         configurarAutocompletado();

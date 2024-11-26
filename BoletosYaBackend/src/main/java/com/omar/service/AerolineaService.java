@@ -11,8 +11,8 @@ public class AerolineaService implements Service<Aerolinea> {
 
     private final AerolineaDAO aerolineaDAO;
 
-    public AerolineaService() throws SQLException {
-        this.aerolineaDAO = new AerolineaDAO();
+    public AerolineaService(AerolineaDAO aerolineaDAO) {
+        this.aerolineaDAO = aerolineaDAO;
     }
 
     @Override

@@ -6,12 +6,13 @@ import com.omar.entity.Cliente;
 import java.sql.SQLException;
 
 public class ClienteService {
+    private final ClienteDAO clienteDAO;
+
+    public ClienteService(ClienteDAO clienteDAO) {
+        this.clienteDAO = clienteDAO;
+    }
+
     public Cliente autenticar(String email, String password) {
-        try {
-            ClienteDAO clienteDAO = new ClienteDAO();
-            return clienteDAO.autenticar(email, password);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return clienteDAO.autenticar(email, password);
     }
 }

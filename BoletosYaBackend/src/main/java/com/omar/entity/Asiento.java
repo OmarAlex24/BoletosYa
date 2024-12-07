@@ -15,6 +15,10 @@ public class Asiento {
         this.disponible = disponible;
     }
 
+    public Asiento() {
+
+    }
+
     public void alternarDisponibilidad() {
         this.disponible = !this.disponible;
     }

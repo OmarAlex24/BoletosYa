@@ -4,6 +4,7 @@ import com.omar.DAO.VueloDAO;
 import com.omar.entity.Vuelo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class VueloService implements Service<Vuelo> {
@@ -44,7 +45,11 @@ public class VueloService implements Service<Vuelo> {
         vueloDAO.eliminar(vuelo);
     }
 
-    public List<Vuelo> buscarVuelosDirectos(String origen, String destino, LocalDate fecha) {
+    public List<Vuelo> buscarVuelosDirectos(String origen, String destino, LocalDateTime fecha) {
         return vueloDAO.buscarVuelosDirectos(origen, destino, fecha);
+    }
+
+    public Vuelo buscarVueloCodigo(String codigo) {
+        return vueloDAO.buscarVueloCodigo(codigo);
     }
 }

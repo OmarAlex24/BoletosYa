@@ -10,7 +10,11 @@ public class ReservacionService implements Service<Reservacion> {
     private final ReservacionDAO reservacionDAO;
 
     public ReservacionService() throws Exception {
-        reservacionDAO = new ReservacionDAO(clienteDAO, asientoDAO, connection);
+        reservacionDAO = new ReservacionDAO();
+    }
+
+    public ReservacionService(ReservacionDAO reservacionDAO) {
+        this.reservacionDAO = reservacionDAO;
     }
 
     @Override

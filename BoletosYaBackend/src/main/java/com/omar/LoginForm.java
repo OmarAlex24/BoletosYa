@@ -17,7 +17,7 @@ public class LoginForm extends JFrame {
     private JLabel messageLabel;
     private ClienteService clienteService = new ClienteService();
 
-    public LoginForm() {
+    public LoginForm() throws SQLException {
         setTitle("Inicio de Sesion");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,6 +65,8 @@ public class LoginForm extends JFrame {
                 try {
                     busquedaVueloFrame = new BusquedaVueloFrame();
                 } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
                 busquedaVueloFrame.setVisible(true);

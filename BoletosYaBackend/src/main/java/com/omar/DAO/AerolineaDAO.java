@@ -2,7 +2,6 @@ package com.omar.DAO;
 
 import com.omar.BD;
 import com.omar.entity.Aerolinea;
-import com.omar.entity.Cliente;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 public class AerolineaDAO implements DAO<Aerolinea> {
     private final Connection connection;
 
-    public AerolineaDAO() throws SQLException {
+    public AerolineaDAO(Connection connection) throws SQLException {
         this.connection = BD.getInstance().getConnection();
     }
 

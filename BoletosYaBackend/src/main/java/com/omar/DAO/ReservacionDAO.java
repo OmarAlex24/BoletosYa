@@ -7,6 +7,7 @@ import com.omar.entity.EstadoReservacion;
 import com.omar.entity.Reservacion;
 import com.omar.service.AsientoService;
 import com.omar.service.ClienteService;
+import com.omar.service.ServiceFactory;
 import lombok.AllArgsConstructor;
 
 import java.sql.Connection;
@@ -20,6 +21,13 @@ public class ReservacionDAO implements DAO<Reservacion> {
     private final Connection connection;
     private final ClienteService clienteService;
     private final AsientoService asientoService;
+
+    public ReservacionDAO() throws SQLException {
+        ServiceFactory serviceFactory = ServiceFactory.getInstance();
+        this.connection = BD.getInstance().getConnection();
+        this.clienteService = serviceFactory.getClienteService();
+        this.asientoService = serviceFactory.getAsientoService();
+    }
 
     @Override
     public Reservacion agregar(Reservacion reservacion) {
@@ -115,6 +123,8 @@ public class ReservacionDAO implements DAO<Reservacion> {
             return null;
         } catch (SQLException e) {
             throw new RuntimeException("Error al buscar reservacion", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -130,8 +140,8 @@ public class ReservacionDAO implements DAO<Reservacion> {
             while (rs.next()) {
                 Reservacion reservacion = new Reservacion();
                 reservacion.setId(rs.getInt("id"));
-                Cliente cliente = clienteDAO.obtenerPorId(rs.getInt("cliente_id"));
-                Asiento asiento = asientoDAO.obtenerPorId(rs.getInt("asiento_id"));
+                Cliente cliente = clienteService.obtenerPorId(rs.getInt("cliente_id"));
+                Asiento asiento = asientoService.obtenerPorId(rs.getInt("asiento_id"));
 
                 reservacion.setCliente(cliente);
                 reservacion.setAsiento(asiento);
@@ -143,6 +153,8 @@ public class ReservacionDAO implements DAO<Reservacion> {
             return reservaciones;
         } catch (SQLException e) {
             throw new RuntimeException("Error al buscar reservaciones", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

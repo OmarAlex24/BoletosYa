@@ -5,6 +5,7 @@ import com.omar.entity.Cliente;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class ClienteDAO implements DAO<Cliente> {
     private final Connection connection;
@@ -85,6 +86,21 @@ public class ClienteDAO implements DAO<Cliente> {
     }
 
     @Override
+    public void eliminarPorId(Integer id) {
+        String sql = "DELETE FROM cliente WHERE id = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar cliente", e);
+        }
+    }
+
+    @Override
     public void modificar(Cliente cliente) {
         String sql = "UPDATE cliente SET nombre = ?, apellidos = ?, email = ?, password = ? WHERE id = ?";
 
@@ -100,6 +116,56 @@ public class ClienteDAO implements DAO<Cliente> {
             ps.close();
         } catch (SQLException e) {
             throw new RuntimeException("Error al modificar cliente", e);
+        }
+    }
+
+    @Override
+    public Cliente obtenerPorId(Integer id) {
+        String sql = "SELECT * FROM cliente WHERE id = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(rs.getInt("id"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setApellidos(rs.getString("apellidos"));
+                cliente.setEmail(rs.getString("email"));
+                cliente.setPassword(rs.getString("password"));
+                return cliente;
+            }
+            ps.close();
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar cliente", e);
+        }
+    }
+
+    @Override
+    public ArrayList<Cliente> listarTodos() {
+        String sql = "SELECT * FROM cliente";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+            ArrayList<Cliente> clientes = new ArrayList<>();
+            while (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(rs.getInt("id"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setApellidos(rs.getString("apellidos"));
+                cliente.setEmail(rs.getString("email"));
+                cliente.setPassword(rs.getString("password"));
+                clientes.add(cliente);
+            }
+            ps.close();
+            return clientes;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar clientes", e);
         }
     }
 

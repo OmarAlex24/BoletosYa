@@ -2,7 +2,9 @@ package com.omar.service;
 
 import com.omar.DAO.AsientoDAO;
 import com.omar.entity.Asiento;
+import com.omar.entity.Vuelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AsientoService implements Service<Asiento> {
@@ -41,5 +43,9 @@ public class AsientoService implements Service<Asiento> {
     @Override
     public void eliminarPorId(Integer id) throws Exception {
         asientoDAO.eliminarPorId(id);
+    }
+
+    public ArrayList<Asiento> listarTodosVuelo(Vuelo vuelo) throws Exception {
+        return asientoDAO.listarTodosVuelo(vuelo);
     }
 }

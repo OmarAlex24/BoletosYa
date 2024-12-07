@@ -4,6 +4,7 @@ import com.google.protobuf.ServiceException;
 import com.omar.entity.Aeropuerto;
 import com.omar.entity.Vuelo;
 import com.omar.service.AeropuertoService;
+import com.omar.service.ServiceFactory;
 import com.omar.service.VueloService;
 import com.toedter.calendar.JDateChooser;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
@@ -11,7 +12,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,32 +24,33 @@ public class BusquedaVueloFrame extends JFrame {
     private JComboBox<String> comboDestino;
     private JDateChooser dateChooser;
     private JButton btnBuscar;
+    private List<Aeropuerto> todosAeropuertos;
 
     private final AeropuertoService aeropuertoService;
     private final VueloService vueloService;
 
-    public BusquedaVueloFrame() throws SQLException {
+    public BusquedaVueloFrame() throws Exception {
         ServiceFactory serviceFactory = ServiceFactory.getInstance();
         this.aeropuertoService = serviceFactory.getAeropuertoService();
         this.vueloService = serviceFactory.getVueloService();
+        this.todosAeropuertos = aeropuertoService.listarTodos();
         setTitle("Búsqueda de Vuelos");
         initComponents();
-        configurarAutocompletado();
+//        configurarAutocompletado();
+        cargarAeropuertos();
     }
 
-    private void initComponents() {
+    private void initComponents() throws Exception {
+
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // Configuración del autocompletado para origen
+        // Configuración de los combos
         comboOrigen = new JComboBox<>();
-        comboOrigen.setEditable(true);
-        AutoCompleteDecorator.decorate(comboOrigen);
-
-        // Configuración del autocompletado para destino
         comboDestino = new JComboBox<>();
-        comboDestino.setEditable(true);
-        AutoCompleteDecorator.decorate(comboDestino);
+
+        // Agregar listener al combo de origen
+        comboOrigen.addActionListener(e -> actualizarDestinos());
 
         // Agregar JDateChooser
         dateChooser = new JDateChooser();
@@ -76,6 +81,28 @@ public class BusquedaVueloFrame extends JFrame {
         add(btnBuscar, gbc);
 
         btnBuscar.addActionListener(e -> buscarVuelos());
+    }
+    private void cargarAeropuertos() {
+        comboOrigen.removeAllItems();
+        comboDestino.removeAllItems();
+
+        for (Aeropuerto aeropuerto : todosAeropuertos) {
+            String item = aeropuerto.getCodigo() + " - " + aeropuerto.getCiudad();
+            comboOrigen.addItem(item);
+            comboDestino.addItem(item);
+        }
+    }
+
+    private void actualizarDestinos() {
+        String origenSeleccionado = (String) comboOrigen.getSelectedItem();
+        comboDestino.removeAllItems();
+
+        for (Aeropuerto aeropuerto : todosAeropuertos) {
+            String item = aeropuerto.getCodigo() + " - " + aeropuerto.getCiudad();
+            if (!item.equals(origenSeleccionado)) {
+                comboDestino.addItem(item);
+            }
+        }
     }
 
     private void configurarAutocompletado() {
@@ -114,6 +141,8 @@ public class BusquedaVueloFrame extends JFrame {
             // Obtener fecha seleccionada
             Date selectedDate = dateChooser.getDate();
 
+            System.out.println(selectedDate);
+
             if (selectedDate == null) {
                 JOptionPane.showMessageDialog(this,
                         "Por favor seleccione una fecha",
@@ -122,12 +151,12 @@ public class BusquedaVueloFrame extends JFrame {
                 return;
             }
 
-            LocalDate fecha = selectedDate.toInstant()
+            LocalDateTime fecha = selectedDate.toInstant()
                     .atZone(java.time.ZoneId.systemDefault())
-                    .toLocalDate();
+                    .toLocalDateTime();
 
             // Validar fecha
-            if (fecha.isBefore(LocalDate.now())) {
+            if (fecha.isBefore(LocalDateTime.now())) {
                 JOptionPane.showMessageDialog(this,
                         "La fecha seleccionada no puede ser anterior a hoy",
                         "Error",
@@ -136,8 +165,8 @@ public class BusquedaVueloFrame extends JFrame {
             }
 
             // Obtener aeropuertos seleccionados
-            String origenTexto = comboOrigen.getSelectedItem().toString();
-            String destinoTexto = comboDestino.getSelectedItem().toString();
+            String origenTexto = comboOrigen.getSelectedItem().toString().substring(0,3);
+            String destinoTexto = comboDestino.getSelectedItem().toString().substring(0,3);
 
             // Validar que origen y destino sean diferentes
             if (origenTexto.equals(destinoTexto)) {
@@ -159,8 +188,10 @@ public class BusquedaVueloFrame extends JFrame {
                 return;
             }
 
+            System.out.println(vuelosDisponibles);
+
             // Abrir ventana de selección de vuelo
-            SeleccionVueloFrame seleccionVuelo = new SeleccionVueloFrame(vuelosDisponibles, aeropuertoService, vueloService);
+            SeleccionVueloFrame seleccionVuelo = new SeleccionVueloFrame(vuelosDisponibles);
             seleccionVuelo.setLocationRelativeTo(this);
             seleccionVuelo.setVisible(true);
             this.dispose(); // Cerrar ventana actual

@@ -3,12 +3,15 @@ package com.omar.DAO;
 import com.omar.BD;
 import com.omar.entity.Aerolinea;
 import com.omar.entity.Aeropuerto;
+import com.omar.entity.Asiento;
 import com.omar.entity.Vuelo;
 import com.omar.service.AerolineaService;
 import com.omar.service.AeropuertoService;
-
+import com.omar.service.AsientoService;
+import com.omar.service.ServiceFactory;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +19,14 @@ public class VueloDAO implements DAO<Vuelo> {
     private final Connection connection;
     private final AeropuertoService aeropuertoService;
     private final AerolineaService aerolineaService;
+    private final AsientoService asientoService;
 
-    public VueloDAO(AeropuertoService aeropuertoService, AerolineaService aerolineaService) throws SQLException {
-        this.aeropuertoService = aeropuertoService;
-        this.aerolineaService = aerolineaService;
+    public VueloDAO() throws SQLException {
+        ServiceFactory serviceFactory = ServiceFactory.getInstance();
         this.connection = BD.getInstance().getConnection();
+        this.aeropuertoService = serviceFactory.getAeropuertoService();
+        this.aerolineaService = serviceFactory.getAerolineaService();
+        this.asientoService = serviceFactory.getAsientoService();
     }
 
     @Override
@@ -31,8 +37,8 @@ public class VueloDAO implements DAO<Vuelo> {
             ps.setInt(1, vuelo.getAerolinea().getId());
             ps.setInt(2, vuelo.getOrigen().getId());
             ps.setInt(3, vuelo.getDestino().getId());
-            ps.setDate(4, java.sql.Date.valueOf(vuelo.getFechaSalida()));
-            ps.setDate(5, java.sql.Date.valueOf(vuelo.getFechaLlegada()));
+            ps.setTimestamp(4, Timestamp.valueOf(vuelo.getFechaSalida()));
+            ps.setTimestamp(5, Timestamp.valueOf(vuelo.getFechaLlegada()));
             ps.setDouble(6, vuelo.getPrecio());
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -84,8 +90,8 @@ public class VueloDAO implements DAO<Vuelo> {
             ps.setInt(1, vuelo.getAerolinea().getId());
             ps.setInt(2, vuelo.getOrigen().getId());
             ps.setInt(3, vuelo.getDestino().getId());
-            ps.setDate(4, Date.valueOf(vuelo.getFechaSalida()));
-            ps.setDate(5, Date.valueOf(vuelo.getFechaLlegada()));
+            ps.setTimestamp(4, Timestamp.valueOf(vuelo.getFechaSalida()));
+            ps.setTimestamp(5, Timestamp.valueOf(vuelo.getFechaLlegada()));
             ps.setDouble(6, vuelo.getPrecio());
             ps.setInt(7, vuelo.getId());
 
@@ -139,8 +145,29 @@ public class VueloDAO implements DAO<Vuelo> {
         }
     }
 
-    public List<Vuelo> buscarVuelosDirectos(String origen, String destino, LocalDate fecha) {
+    public Vuelo buscarVueloCodigo(String codigo) {
+        String sql = "SELECT * FROM boletos_ya_db.vuelo WHERE codigo = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, codigo);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapearVuelo(rs);
+            }
+            ps.close();
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar vuelo", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Vuelo> buscarVuelosDirectos(String origen, String destino, LocalDateTime fecha) {
         List<Vuelo> vuelos = new ArrayList<>();
+
         String query = """
           SELECT v.*, a.nombre as aerolinea_nombre, a.codigo as aerolinea_codigo,
           ao.*, ad.*
@@ -150,20 +177,19 @@ public class VueloDAO implements DAO<Vuelo> {
           JOIN boletos_ya_db.aeropuerto ad ON v.destino_id = ad.id
           WHERE ao.codigo = ? AND ad.codigo = ?
           AND DATE(fecha_salida) = ?
-      """;
+          """;
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, origen);
             stmt.setString(2, destino);
-            stmt.setDate(3, Date.valueOf(fecha));
+            stmt.setDate(3, Date.valueOf(fecha.toLocalDate()));
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Vuelo vuelo = mapearVuelo(rs);
                 vuelos.add(vuelo);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -181,9 +207,13 @@ public class VueloDAO implements DAO<Vuelo> {
         vuelo.setAerolinea(aerolinea);
         vuelo.setOrigen(origen);
         vuelo.setDestino(destino);
-        vuelo.setFechaSalida(rs.getDate("fecha_salida").toLocalDate());
-        vuelo.setFechaLlegada(rs.getDate("fecha_llegada").toLocalDate());
+        vuelo.setCodigo(rs.getString("codigo"));
+        vuelo.setFechaSalida(rs.getTimestamp("fecha_salida").toLocalDateTime());
+        vuelo.setFechaLlegada(rs.getTimestamp("fecha_llegada").toLocalDateTime());
         vuelo.setPrecio(rs.getDouble("precio"));
+
+        ArrayList<Asiento> asientos = asientoService.listarTodosVuelo(vuelo);
+
         return vuelo;
     }
 }

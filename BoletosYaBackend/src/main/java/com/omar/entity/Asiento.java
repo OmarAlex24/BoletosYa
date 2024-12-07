@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class Asiento {
     private int id;
-    private Vuelo vuelo;
+    private int vueloId;
     private String numeroAsiento;
     private boolean disponible;
 
-    public Asiento(Vuelo vuelo, String numeroAsiento, boolean disponible) {
-        this.vuelo = vuelo;
+    public Asiento(int vueloId, String numeroAsiento, boolean disponible) {
+        this.vueloId = vueloId;
         this.numeroAsiento = numeroAsiento;
         this.disponible = disponible;
     }

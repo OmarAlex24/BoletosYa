@@ -45,6 +45,10 @@ public class AsientoService implements Service<Asiento> {
         asientoDAO.eliminarPorId(id);
     }
 
+    public void alternarDisponibilidad(Asiento asiento) throws Exception {
+        asientoDAO.alternarDisponibilidad(asiento);
+    }
+
     public ArrayList<Asiento> listarTodosVuelo(Vuelo vuelo) throws Exception {
         return asientoDAO.listarTodosVuelo(vuelo);
     }

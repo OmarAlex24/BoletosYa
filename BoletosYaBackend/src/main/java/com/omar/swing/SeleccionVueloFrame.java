@@ -59,7 +59,13 @@ public class SeleccionVueloFrame extends JFrame {
         JButton btnSeleccionar = new JButton("Seleccionar Vuelo");
         JButton btnVolver = new JButton("Volver");
 
-        btnSeleccionar.addActionListener(e -> seleccionarVuelo());
+        btnSeleccionar.addActionListener(e -> {
+            try {
+                seleccionarVuelo();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btnVolver.addActionListener(e -> {
             try {
                 volver();
@@ -99,7 +105,7 @@ public class SeleccionVueloFrame extends JFrame {
         return String.format("%dh %dm", horas, minutos);
     }
 
-    private void seleccionarVuelo() {
+    private void seleccionarVuelo() throws SQLException {
         int filaSeleccionada = tablaVuelos.getSelectedRow();
         if (filaSeleccionada == -1) {
             JOptionPane.showMessageDialog(this,

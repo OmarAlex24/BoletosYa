@@ -14,12 +14,9 @@ import java.util.ArrayList;
 
 public class AsientoDAO implements DAO<Asiento> {
     private final Connection connection;
-    private final VueloService vueloService;
 
     public AsientoDAO() throws SQLException {
-        ServiceFactory serviceFactory = ServiceFactory.getInstance();
         this.connection = BD.getInstance().getConnection();
-        this.vueloService = serviceFactory.getVueloService();
     }
 
     @Override
@@ -28,7 +25,7 @@ public class AsientoDAO implements DAO<Asiento> {
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, asiento.getVuelo().getId());
+            ps.setInt(1, asiento.getVueloId());
             ps.setString(2, asiento.getNumeroAsiento());
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
@@ -103,8 +100,8 @@ public class AsientoDAO implements DAO<Asiento> {
                 Asiento asiento = new Asiento();
                 asiento.setId(rs.getInt("id"));
                 asiento.setNumeroAsiento(rs.getString("numero_asiento"));
-                Vuelo vuelo = vueloService.obtenerPorId(rs.getInt("vuelo_id"));
-                asiento.setVuelo(vuelo);
+                asiento.setVueloId(rs.getInt("vuelo_id"));
+                asiento.setDisponible(rs.getBoolean("disponible"));
                 return asiento;
             }
             ps.close();
@@ -129,8 +126,7 @@ public class AsientoDAO implements DAO<Asiento> {
                 Asiento asiento = new Asiento();
                 asiento.setId(rs.getInt("id"));
                 asiento.setNumeroAsiento(rs.getString("numero_asiento"));
-                Vuelo vuelo = vueloService.obtenerPorId(rs.getInt("vuelo_id"));
-                asiento.setVuelo(vuelo);
+                asiento.setVueloId(rs.getInt("vuelo_id"));
                 asientos.add(asiento);
             }
             ps.close();
@@ -139,6 +135,19 @@ public class AsientoDAO implements DAO<Asiento> {
             throw new RuntimeException("Error al buscar asientos", e);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void alternarDisponibilidad(Asiento asiento) throws Exception {
+        String sql = "UPDATE boletos_ya_db.asiento SET disponible = NOT disponible WHERE id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, asiento.getId());
+
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al modificar asiento", e);
         }
     }
 
@@ -162,7 +171,7 @@ public class AsientoDAO implements DAO<Asiento> {
                 Asiento asiento = new Asiento();
                 asiento.setId(rs.getInt("id"));
                 asiento.setNumeroAsiento(rs.getString("numero_asiento"));
-                asiento.setVuelo(vuelo);
+                asiento.setVueloId(vuelo.getId());
                 asiento.setDisponible(rs.getBoolean("disponible"));
                 asientos.add(asiento);
             }

@@ -19,7 +19,7 @@ public class VueloDAO implements DAO<Vuelo> {
     private final Connection connection;
     private final AeropuertoService aeropuertoService;
     private final AerolineaService aerolineaService;
-    private final AsientoService asientoService;
+    private AsientoService asientoService;
 
     public VueloDAO() throws SQLException {
         ServiceFactory serviceFactory = ServiceFactory.getInstance();
@@ -211,8 +211,7 @@ public class VueloDAO implements DAO<Vuelo> {
         vuelo.setFechaSalida(rs.getTimestamp("fecha_salida").toLocalDateTime());
         vuelo.setFechaLlegada(rs.getTimestamp("fecha_llegada").toLocalDateTime());
         vuelo.setPrecio(rs.getDouble("precio"));
-
-        ArrayList<Asiento> asientos = asientoService.listarTodosVuelo(vuelo);
+        vuelo.setAsientos(asientoService.listarTodosVuelo(vuelo));
 
         return vuelo;
     }

@@ -25,8 +25,15 @@ public class SeleccionVueloFrame extends JFrame {
     private void initComponents() {
         setLayout(new BorderLayout(10, 10));
 
+        // Título
+        JLabel titleLabel = new JLabel("Tenemos estos vuelos");
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 10, 20, 10));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(titleLabel, BorderLayout.NORTH);
+
         // Configurar tabla
-        String[] columnas = {"Vuelo", "Salida", "Llegada", "Duración", "Precio"};
+        String[] columnas = {"Aerolínea", "Fecha Salida", "Hora Salida", "Fecha Llegada", "Hora Llegada", "Duración", "Precio"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -36,15 +43,22 @@ public class SeleccionVueloFrame extends JFrame {
 
         tablaVuelos = new JTable(modeloTabla);
         tablaVuelos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tablaVuelos.setRowHeight(25); // Altura de las filas
+        tablaVuelos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14)); // Fuente del encabezado
+        tablaVuelos.setFont(new Font("Arial", Font.PLAIN, 14)); // Fuente de las celdas
 
         // Agregar tabla a un scroll pane
         JScrollPane scrollPane = new JScrollPane(tablaVuelos);
         add(scrollPane, BorderLayout.CENTER);
 
         // Panel de botones
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JButton btnSeleccionar = new JButton("Seleccionar Vuelo");
         JButton btnVolver = new JButton("Volver");
+
+        // Estilizar botones
+        estilizarBoton(btnSeleccionar);
+        estilizarBoton(btnVolver);
 
         btnSeleccionar.addActionListener(_ -> {
             try {
@@ -61,24 +75,27 @@ public class SeleccionVueloFrame extends JFrame {
             }
         });
 
-        panelBotones.add(btnSeleccionar);
         panelBotones.add(btnVolver);
+        panelBotones.add(btnSeleccionar);
         add(panelBotones, BorderLayout.SOUTH);
 
         // Configurar ventana
-        setSize(800, 400);
+        setSize(1000, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void cargarVuelos() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         for (Vuelo vuelo : vuelos) {
             modeloTabla.addRow(new Object[]{
-                    vuelo.getAerolinea().getCodigo() + vuelo.getId(),
-                    vuelo.getFechaSalida().format(formatter),
-                    vuelo.getFechaLlegada().format(formatter),
+                    vuelo.getAerolinea().getNombre(),
+                    vuelo.getFechaSalida().format(fechaFormatter),
+                    vuelo.getFechaSalida().format(horaFormatter),
+                    vuelo.getFechaLlegada().format(fechaFormatter),
+                    vuelo.getFechaLlegada().format(horaFormatter),
                     calcularDuracion(vuelo),
                     String.format("$%.2f", vuelo.getPrecio())
             });
@@ -114,5 +131,15 @@ public class SeleccionVueloFrame extends JFrame {
         busqueda.setLocationRelativeTo(this);
         busqueda.setVisible(true);
         this.dispose();
+    }
+
+    private void estilizarBoton(JButton boton) {
+        boton.setFont(new Font("Arial", Font.BOLD, 14)); // Fuente y tamaño
+        boton.setForeground(Color.BLACK); // Texto negro
+        boton.setBackground(Color.WHITE); // Fondo blanco
+        boton.setFocusPainted(false); // Quitar borde de enfoque
+        boton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Borde negro
+        boton.setPreferredSize(new Dimension(150, 30)); // Tamaño reducido
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cursor de mano
     }
 }

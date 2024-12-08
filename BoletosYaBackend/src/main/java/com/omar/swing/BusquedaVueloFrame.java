@@ -1,11 +1,13 @@
 package com.omar.swing;
 
+import com.omar.LoginForm;
 import com.omar.entity.Aeropuerto;
 import com.omar.entity.Vuelo;
 import com.omar.service.AeropuertoService;
 import com.omar.service.ServiceFactory;
 import com.omar.service.VueloService;
 import com.toedter.calendar.JDateChooser;
+
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -36,47 +38,99 @@ public class BusquedaVueloFrame extends JFrame {
     }
 
     private void initComponents() {
-
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Espaciado entre componentes
 
-        // Configuración de los combos
+        // Título
+        JLabel titleLabel = new JLabel("¿A dónde quieres ir?");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(titleLabel, gbc);
+
+        // Etiqueta y combo de origen
+        JLabel origenLabel = new JLabel("Origen:");
+        origenLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(origenLabel, gbc);
+
         comboOrigen = new JComboBox<>();
-        comboDestino = new JComboBox<>();
-
-        // Agregar listener al combo de origen
+        comboOrigen.setPreferredSize(new Dimension(200, 30));
         comboOrigen.addActionListener(_ -> actualizarDestinos());
-
-        // Agregar JDateChooser
-        dateChooser = new JDateChooser();
-        dateChooser.setDateFormatString("dd/MM/yyyy");
-
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(new JLabel("Fecha:"), gbc);
-
         gbc.gridx = 1;
-        add(dateChooser, gbc);
-
-        // Agregar componentes
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridx = 0; gbc.gridy = 0;
-        add(new JLabel("Origen:"), gbc);
-
-        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         add(comboOrigen, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(new JLabel("Destino:"), gbc);
+        // Etiqueta y combo de destino
+        JLabel destinoLabel = new JLabel("Destino:");
+        destinoLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(destinoLabel, gbc);
 
+        comboDestino = new JComboBox<>();
+        comboDestino.setPreferredSize(new Dimension(200, 30));
         gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         add(comboDestino, gbc);
 
-        JButton btnBuscar = new JButton("Buscar Vuelos");
-        gbc.gridx = 1; gbc.gridy = 3;
-        add(btnBuscar, gbc);
+        // Etiqueta y selector de fecha
+        JLabel fechaLabel = new JLabel("Fecha:");
+        fechaLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(fechaLabel, gbc);
 
+        dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+        dateChooser.setPreferredSize(new Dimension(200, 30));
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(dateChooser, gbc);
+
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        
+        // Botón de cerrar sesión
+        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+        btnCerrarSesion.setFont(new Font("Arial", Font.BOLD, 14)); // Fuente y tamaño
+        btnCerrarSesion.setForeground(Color.BLACK); // Texto negro
+        btnCerrarSesion.setBackground(Color.WHITE); // Fondo blanco
+        btnCerrarSesion.setFocusPainted(false); // Quitar borde de enfoque
+        btnCerrarSesion.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Borde negro
+        btnCerrarSesion.setPreferredSize(new Dimension(120, 30)); // Tamaño reducido
+        btnCerrarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cursor de mano
+        btnCerrarSesion.addActionListener(e -> cerrarSesion());
+
+        panelBotones.add(btnCerrarSesion);
+
+        // Botón de búsqueda
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setFont(new Font("Arial", Font.BOLD, 14)); // Fuente y tamaño
+        btnBuscar.setForeground(Color.BLACK); // Texto negro
+        btnBuscar.setBackground(Color.WHITE); // Fondo blanco
+        btnBuscar.setFocusPainted(false); // Quitar borde de enfoque
+        btnBuscar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Borde negro
+        btnBuscar.setPreferredSize(new Dimension(120, 30)); // Tamaño reducido
+        btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cursor de mano
         btnBuscar.addActionListener(_ -> buscarVuelos());
+
+        panelBotones.add(btnBuscar);
+        add(panelBotones, gbc);
     }
+
     private void cargarAeropuertos() {
         comboOrigen.removeAllItems();
         comboDestino.removeAllItems();
@@ -127,8 +181,8 @@ public class BusquedaVueloFrame extends JFrame {
             }
 
             // Obtener aeropuertos seleccionados
-            String origenTexto = Objects.requireNonNull(comboOrigen.getSelectedItem()).toString().substring(0,3);
-            String destinoTexto = Objects.requireNonNull(comboDestino.getSelectedItem()).toString().substring(0,3);
+            String origenTexto = Objects.requireNonNull(comboOrigen.getSelectedItem()).toString().substring(0, 3);
+            String destinoTexto = Objects.requireNonNull(comboDestino.getSelectedItem()).toString().substring(0, 3);
 
             // Validar que origen y destino sean diferentes
             if (origenTexto.equals(destinoTexto)) {
@@ -163,5 +217,16 @@ public class BusquedaVueloFrame extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
+    }
+
+    private void cerrarSesion() {
+        // Volver al frame de login
+        try {
+            LoginForm loginForm = new LoginForm();
+            loginForm.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dispose(); // Cerrar el frame actual
     }
 }

@@ -9,6 +9,7 @@ import com.omar.service.AerolineaService;
 import com.omar.service.AeropuertoService;
 import com.omar.service.AsientoService;
 import com.omar.service.ServiceFactory;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,13 +34,16 @@ public class VueloDAO implements DAO<Vuelo> {
     public Vuelo agregar(Vuelo vuelo) {
         String sql = "INSERT INTO boletos_ya_db.vuelo (aerolinea_id, origen_id, destino_id, fecha_salida, fecha_llegada, precio) VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, vuelo.getAerolinea().getId());
             ps.setInt(2, vuelo.getOrigen().getId());
             ps.setInt(3, vuelo.getDestino().getId());
             ps.setTimestamp(4, Timestamp.valueOf(vuelo.getFechaSalida()));
             ps.setTimestamp(5, Timestamp.valueOf(vuelo.getFechaLlegada()));
             ps.setDouble(6, vuelo.getPrecio());
+
+            ps.executeUpdate();
+
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 vuelo.setId(generatedKeys.getInt(1));
@@ -169,15 +173,15 @@ public class VueloDAO implements DAO<Vuelo> {
         List<Vuelo> vuelos = new ArrayList<>();
 
         String query = """
-          SELECT v.*, a.nombre as aerolinea_nombre, a.codigo as aerolinea_codigo,
-          ao.*, ad.*
-          FROM boletos_ya_db.vuelo v
-          JOIN boletos_ya_db.aerolinea a ON v.id = a.id
-          JOIN boletos_ya_db.aeropuerto ao ON v.origen_id = ao.id
-          JOIN boletos_ya_db.aeropuerto ad ON v.destino_id = ad.id
-          WHERE ao.codigo = ? AND ad.codigo = ?
-          AND DATE(fecha_salida) = ?
-          """;
+                SELECT v.*, a.nombre as aerolinea_nombre, a.codigo as aerolinea_codigo,
+                ao.*, ad.*
+                FROM boletos_ya_db.vuelo v
+                JOIN boletos_ya_db.aerolinea a ON v.aerolinea_id = a.id
+                JOIN boletos_ya_db.aeropuerto ao ON v.origen_id = ao.id
+                JOIN boletos_ya_db.aeropuerto ad ON v.destino_id = ad.id
+                WHERE ao.codigo = ? AND ad.codigo = ?
+                AND DATE(fecha_salida) = ?
+                """;
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, origen);
@@ -207,7 +211,6 @@ public class VueloDAO implements DAO<Vuelo> {
         vuelo.setAerolinea(aerolinea);
         vuelo.setOrigen(origen);
         vuelo.setDestino(destino);
-        vuelo.setCodigo(rs.getString("codigo"));
         vuelo.setFechaSalida(rs.getTimestamp("fecha_salida").toLocalDateTime());
         vuelo.setFechaLlegada(rs.getTimestamp("fecha_llegada").toLocalDateTime());
         vuelo.setPrecio(rs.getDouble("precio"));

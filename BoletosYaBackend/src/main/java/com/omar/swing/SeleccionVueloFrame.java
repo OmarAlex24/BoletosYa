@@ -2,7 +2,6 @@ package com.omar.swing;
 
 import com.omar.BD;
 import com.omar.entity.Vuelo;
-import com.omar.service.AerolineaService;
 import com.omar.service.AeropuertoService;
 import com.omar.service.ServiceFactory;
 import com.omar.service.VueloService;

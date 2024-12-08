@@ -36,7 +36,10 @@ public class BusquedaVueloFrame extends JFrame {
         this.todosAeropuertos = aeropuertoService.listarTodos();
         setTitle("Búsqueda de Vuelos");
         initComponents();
-//        configurarAutocompletado();
+        setSize(800, 400);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         cargarAeropuertos();
     }
 

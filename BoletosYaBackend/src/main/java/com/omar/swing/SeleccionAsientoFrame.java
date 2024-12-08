@@ -2,6 +2,7 @@ package com.omar.swing;
 
 import com.omar.entity.Asiento;
 import com.omar.entity.Vuelo;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -61,7 +62,7 @@ public class SeleccionAsientoFrame extends JFrame {
     }
 
     private JPanel createInfoPanel() {
-        JPanel panelInfo = new JPanel(new GridLayout(3, 1, 5, 5));
+        JPanel panelInfo = new JPanel(new GridLayout(4, 1, 5, 5));
         panelInfo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                 new EmptyBorder(15, 15, 15, 15)
@@ -69,7 +70,7 @@ public class SeleccionAsientoFrame extends JFrame {
         panelInfo.setBackground(new Color(248, 248, 248));
 
         // Título del vuelo
-        JLabel titleLabel = new JLabel("Vuelo " + vuelo.getCodigo(), SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Aerolinea " + vuelo.getAerolinea().getNombre(), SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
 
         // Ruta
@@ -78,13 +79,18 @@ public class SeleccionAsientoFrame extends JFrame {
         rutaLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         // Fecha y hora
-        JLabel fechaLabel = new JLabel("Salida: " + vuelo.getFechaSalida(),
+        JLabel fechaSalidaLabel = new JLabel("Salida: " + DiasDeLaSemana.fromDayOfWeek(vuelo.getFechaSalida().getDayOfWeek()) + " " + vuelo.getFechaSalida().getDayOfMonth() + " de " + MesDelAño.fromMonth(vuelo.getFechaSalida().getMonthValue()) + " del " + vuelo.getFechaSalida().getYear(),
                 SwingConstants.CENTER);
-        fechaLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        fechaSalidaLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        JLabel fechaLlegadaLabel = new JLabel("Llegada: " + DiasDeLaSemana.fromDayOfWeek(vuelo.getFechaLlegada().getDayOfWeek()) + " " + vuelo.getFechaLlegada().getDayOfMonth() + " de " + MesDelAño.fromMonth(vuelo.getFechaLlegada().getMonthValue()) + " del " + vuelo.getFechaLlegada().getYear(),
+                SwingConstants.CENTER);
+        fechaLlegadaLabel.setFont(new Font("Arial", Font.PLAIN, 16));
 
         panelInfo.add(titleLabel);
         panelInfo.add(rutaLabel);
-        panelInfo.add(fechaLabel);
+        panelInfo.add(fechaSalidaLabel);
+        panelInfo.add(fechaLlegadaLabel);
 
         return panelInfo;
     }
@@ -139,7 +145,7 @@ public class SeleccionAsientoFrame extends JFrame {
             btnAsiento.setEnabled(false);
         } else {
             btnAsiento.setBackground(COLOR_DISPONIBLE);
-            btnAsiento.addActionListener(e -> seleccionarAsiento((JButton)e.getSource(), asiento));
+            btnAsiento.addActionListener(e -> seleccionarAsiento((JButton) e.getSource(), asiento));
         }
 
         return btnAsiento;
@@ -214,4 +220,5 @@ public class SeleccionAsientoFrame extends JFrame {
         confirmacionBoleto.setVisible(true);
         this.dispose();
     }
+
 }

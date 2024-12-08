@@ -2,10 +2,8 @@ package com.omar.DAO;
 
 import com.omar.BD;
 import com.omar.entity.Aeropuerto;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +19,13 @@ public class AeropuertoDAO implements DAO<Aeropuerto> {
         String sql = "INSERT INTO boletos_ya_db.aeropuerto (codigo, nombre, ciudad, pais) VALUES (?, ?, ?, ?)";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, aeropuerto.getCodigo());
             ps.setString(2, aeropuerto.getNombre());
             ps.setString(3, aeropuerto.getCiudad());
             ps.setString(4, aeropuerto.getPais());
+
+            ps.executeUpdate();
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {

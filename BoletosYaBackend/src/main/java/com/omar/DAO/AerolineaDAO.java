@@ -3,16 +3,13 @@ package com.omar.DAO;
 import com.omar.BD;
 import com.omar.entity.Aerolinea;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class AerolineaDAO implements DAO<Aerolinea> {
     private final Connection connection;
 
-    public AerolineaDAO(Connection connection) throws SQLException {
+    public AerolineaDAO() throws SQLException {
         this.connection = BD.getInstance().getConnection();
     }
 
@@ -21,9 +18,11 @@ public class AerolineaDAO implements DAO<Aerolinea> {
         String sql = "INSERT INTO aerolinea (nombre, codigo) VALUES (?, ?)";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, aerolinea.getNombre());
             ps.setString(2, aerolinea.getCodigo());
+
+            ps.executeUpdate();
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {

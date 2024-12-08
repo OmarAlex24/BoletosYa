@@ -6,10 +6,7 @@ import com.omar.entity.Vuelo;
 import com.omar.service.ServiceFactory;
 import com.omar.service.VueloService;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class AsientoDAO implements DAO<Asiento> {
@@ -24,7 +21,7 @@ public class AsientoDAO implements DAO<Asiento> {
         String sql = "INSERT INTO asiento (vuelo_id, numero_asiento) VALUES (?, ?)";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, asiento.getVueloId());
             ps.setString(2, asiento.getNumeroAsiento());
 
@@ -153,13 +150,13 @@ public class AsientoDAO implements DAO<Asiento> {
 
     public ArrayList<Asiento> listarTodosVuelo(Vuelo vuelo) throws Exception {
         String query = """
-          SELECT a.*
-          FROM boletos_ya_db.asiento a
-          JOIN boletos_ya_db.vuelo v ON a.vuelo_id = v.id
-          JOIN boletos_ya_db.aerolinea ao ON v.id = ao.id
-          JOIN boletos_ya_db.aeropuerto ad ON v.destino_id = ad.id
-          WHERE v.id = ?
-          """;
+                SELECT a.*
+                FROM boletos_ya_db.asiento a
+                JOIN boletos_ya_db.vuelo v ON a.vuelo_id = v.id
+                JOIN boletos_ya_db.aerolinea ao ON v.id = ao.id
+                JOIN boletos_ya_db.aeropuerto ad ON v.destino_id = ad.id
+                WHERE v.id = ?
+                """;
 
         ArrayList<Asiento> asientos = new ArrayList<>();
 

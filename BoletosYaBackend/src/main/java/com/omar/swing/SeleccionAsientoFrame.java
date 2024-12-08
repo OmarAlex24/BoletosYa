@@ -17,7 +17,7 @@ public class SeleccionAsientoFrame extends JFrame {
     private static final Color COLOR_NO_DISPONIBLE = new Color(211, 211, 211); // Gris claro
     private static final Color COLOR_SELECCIONADO = new Color(0, 0, 250); // Azul fuerte
 
-    public SeleccionAsientoFrame(Vuelo vuelo) throws SQLException {
+    public SeleccionAsientoFrame(Vuelo vuelo) {
         this.vuelo = vuelo;
         setTitle("Selección de Asiento - BoletosYa");
         initComponents();
@@ -48,7 +48,7 @@ public class SeleccionAsientoFrame extends JFrame {
         // Botón de confirmación
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnConfirmar = new JButton("Confirmar");
-        btnConfirmar.addActionListener(e -> {
+        btnConfirmar.addActionListener(_ -> {
             try {
                 seleccionarAsiento();
             } catch (Exception ex) {

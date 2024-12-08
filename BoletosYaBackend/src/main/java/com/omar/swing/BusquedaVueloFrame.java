@@ -7,24 +7,20 @@ import com.omar.service.AeropuertoService;
 import com.omar.service.ServiceFactory;
 import com.omar.service.VueloService;
 import com.toedter.calendar.JDateChooser;
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class BusquedaVueloFrame extends JFrame {
     private JComboBox<String> comboOrigen;
     private JComboBox<String> comboDestino;
     private JDateChooser dateChooser;
-    private JButton btnBuscar;
-    private List<Aeropuerto> todosAeropuertos;
+    private final List<Aeropuerto> todosAeropuertos;
 
     private final AeropuertoService aeropuertoService;
     private final VueloService vueloService;
@@ -43,7 +39,7 @@ public class BusquedaVueloFrame extends JFrame {
         cargarAeropuertos();
     }
 
-    private void initComponents() throws Exception {
+    private void initComponents() {
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -53,7 +49,7 @@ public class BusquedaVueloFrame extends JFrame {
         comboDestino = new JComboBox<>();
 
         // Agregar listener al combo de origen
-        comboOrigen.addActionListener(e -> actualizarDestinos());
+        comboOrigen.addActionListener(_ -> actualizarDestinos());
 
         // Agregar JDateChooser
         dateChooser = new JDateChooser();
@@ -79,11 +75,11 @@ public class BusquedaVueloFrame extends JFrame {
         gbc.gridx = 1;
         add(comboDestino, gbc);
 
-        btnBuscar = new JButton("Buscar Vuelos");
+        JButton btnBuscar = new JButton("Buscar Vuelos");
         gbc.gridx = 1; gbc.gridy = 3;
         add(btnBuscar, gbc);
 
-        btnBuscar.addActionListener(e -> buscarVuelos());
+        btnBuscar.addActionListener(_ -> buscarVuelos());
     }
     private void cargarAeropuertos() {
         comboOrigen.removeAllItems();
@@ -108,43 +104,10 @@ public class BusquedaVueloFrame extends JFrame {
         }
     }
 
-    private void configurarAutocompletado() {
-        comboOrigen.getEditor().getEditorComponent().addKeyListener(
-                new KeyAdapter() {
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                        String texto = comboOrigen.getEditor().getItem().toString();
-                        actualizarSugerencias(comboOrigen, texto);
-                    }
-                }
-        );
-    }
-
-    private void actualizarSugerencias(JComboBox<String> combo, String texto) {
-        try {
-            List<Aeropuerto> aeropuertos =
-                    aeropuertoService.buscarPorNombreOCodigo(texto);
-
-            combo.removeAllItems();
-            for (Aeropuerto aeropuerto : aeropuertos) {
-                combo.addItem(aeropuerto.getCodigo() + " - " +
-                        aeropuerto.getCiudad());
-            }
-            combo.showPopup();
-        } catch (ServiceException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error al buscar aeropuertos: " + ex.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void buscarVuelos() {
         try {
             // Obtener fecha seleccionada
             Date selectedDate = dateChooser.getDate();
-
-            System.out.println(selectedDate);
 
             if (selectedDate == null) {
                 JOptionPane.showMessageDialog(this,
@@ -168,8 +131,8 @@ public class BusquedaVueloFrame extends JFrame {
             }
 
             // Obtener aeropuertos seleccionados
-            String origenTexto = comboOrigen.getSelectedItem().toString().substring(0,3);
-            String destinoTexto = comboDestino.getSelectedItem().toString().substring(0,3);
+            String origenTexto = Objects.requireNonNull(comboOrigen.getSelectedItem()).toString().substring(0,3);
+            String destinoTexto = Objects.requireNonNull(comboDestino.getSelectedItem()).toString().substring(0,3);
 
             // Validar que origen y destino sean diferentes
             if (origenTexto.equals(destinoTexto)) {
@@ -191,8 +154,6 @@ public class BusquedaVueloFrame extends JFrame {
                 return;
             }
 
-            System.out.println(vuelosDisponibles);
-
             // Abrir ventana de selección de vuelo
             SeleccionVueloFrame seleccionVuelo = new SeleccionVueloFrame(vuelosDisponibles);
             seleccionVuelo.setLocationRelativeTo(this);
@@ -206,19 +167,5 @@ public class BusquedaVueloFrame extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
-    }
-
-    private Aeropuerto obtenerAeropuerto(String texto) throws Exception {
-        // Extraer código de aeropuerto (asumiendo formato "XXX - Ciudad")
-        String codigo = texto.split("-")[0].trim();
-
-        // Buscar aeropuerto por código
-        Aeropuerto aeropuerto = aeropuertoService.buscarPorCodigo(codigo);
-
-        if (aeropuerto == null) {
-            throw new ServiceException("No se encontró el aeropuerto con código: " + codigo);
-        }
-
-        return aeropuerto;
     }
 }

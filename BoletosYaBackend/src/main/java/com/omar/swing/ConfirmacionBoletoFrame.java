@@ -7,8 +7,6 @@ import com.omar.service.ServiceFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -17,7 +15,7 @@ public class ConfirmacionBoletoFrame extends JFrame {
     private final Vuelo vuelo;
     private final AsientoService asientoService;
 
-    public ConfirmacionBoletoFrame(Vuelo vuelo, Asiento asiento) throws SQLException, MalformedURLException {
+    public ConfirmacionBoletoFrame(Vuelo vuelo, Asiento asiento) throws SQLException {
         ServiceFactory serviceFactory = ServiceFactory.getInstance();
         this.asientoService = serviceFactory.getAsientoService();
         this.vuelo = vuelo;
@@ -31,7 +29,7 @@ public class ConfirmacionBoletoFrame extends JFrame {
         initComponents();
     }
 
-    private void initComponents() throws MalformedURLException {
+    private void initComponents() {
         // Configuración del layout principal
         setLayout(new BorderLayout(10, 10));
         setBorderPadding();
@@ -73,8 +71,8 @@ public class ConfirmacionBoletoFrame extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
 
         // Cargar íconos desde el classpath
-        ImageIcon cancelarIcon = new ImageIcon(getClass().getResource("/assets/images/cancel.png"));
-        ImageIcon confirmarIcon = new ImageIcon(getClass().getResource("/assets/images/confirm.png"));
+        ImageIcon cancelarIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/assets/images/cancel.png")));
+        ImageIcon confirmarIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/assets/images/confirm.png")));
 
         JButton cancelarButton = new JButton("Cancelar", cancelarIcon);
         JButton confirmarButton = new JButton("Confirmar", confirmarIcon);
@@ -84,8 +82,8 @@ public class ConfirmacionBoletoFrame extends JFrame {
         confirmarButton.setPreferredSize(new Dimension(150, 60));
 
         // Añadir action listeners
-        cancelarButton.addActionListener(e -> cancelarReserva());
-        confirmarButton.addActionListener(e -> confirmarReserva());
+        cancelarButton.addActionListener(_ -> cancelarReserva());
+        confirmarButton.addActionListener(_ -> confirmarReserva());
 
         buttonPanel.add(cancelarButton);
         buttonPanel.add(confirmarButton);

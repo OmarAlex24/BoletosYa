@@ -2,10 +2,6 @@ package com.omar.swing;
 
 import com.omar.entity.Asiento;
 import com.omar.entity.Vuelo;
-import com.omar.service.AsientoService;
-import com.omar.service.ServiceFactory;
-import com.omar.service.VueloService;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -20,11 +16,8 @@ public class SeleccionAsientoFrame extends JFrame {
     private static final Color COLOR_DISPONIBLE = new Color(144, 238, 144); // Verde claro
     private static final Color COLOR_NO_DISPONIBLE = new Color(211, 211, 211); // Gris claro
     private static final Color COLOR_SELECCIONADO = new Color(0, 0, 250); // Azul fuerte
-    private final AsientoService asientoService;
 
     public SeleccionAsientoFrame(Vuelo vuelo) throws SQLException {
-        ServiceFactory serviceFactory = ServiceFactory.getInstance();
-        this.asientoService = serviceFactory.getAsientoService();
         this.vuelo = vuelo;
         setTitle("Selección de Asiento - BoletosYa");
         initComponents();
@@ -217,9 +210,9 @@ public class SeleccionAsientoFrame extends JFrame {
             return;
         }
 
-        // Cambiar el estado de la asiento
-        asientoService.alternarDisponibilidad(asientoSeleccionado);
-
-//        this.dispose();
+        ConfirmacionBoletoFrame confirmacionBoleto = new ConfirmacionBoletoFrame(vuelo, asientoSeleccionado);
+        confirmacionBoleto.setLocationRelativeTo(this);
+        confirmacionBoleto.setVisible(true);
+        this.dispose();
     }
 }

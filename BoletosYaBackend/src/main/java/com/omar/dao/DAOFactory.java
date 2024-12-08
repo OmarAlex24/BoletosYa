@@ -34,7 +34,7 @@ public class DAOFactory {
 
     public AerolineaDAO getAerolineaDAO() throws SQLException {
         if (aerolineaDAO == null) {
-            aerolineaDAO = new AerolineaDAO(connection);
+            aerolineaDAO = new AerolineaDAO();
         }
         return aerolineaDAO;
     }

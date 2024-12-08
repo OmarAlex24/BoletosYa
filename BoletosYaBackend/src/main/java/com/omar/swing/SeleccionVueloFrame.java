@@ -115,7 +115,6 @@ public class SeleccionVueloFrame extends JFrame {
         }
 
         Vuelo vueloSeleccionado = vuelos.get(filaSeleccionada);
-        System.out.println(vueloSeleccionado);
         SeleccionAsientoFrame seleccionAsiento = new SeleccionAsientoFrame(vueloSeleccionado);
         seleccionAsiento.setLocationRelativeTo(this);
         seleccionAsiento.setVisible(true);

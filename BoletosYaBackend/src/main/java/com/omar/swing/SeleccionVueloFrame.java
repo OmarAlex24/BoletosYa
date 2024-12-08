@@ -1,15 +1,10 @@
 package com.omar.swing;
 
-import com.omar.BD;
 import com.omar.entity.Vuelo;
-import com.omar.service.AeropuertoService;
-import com.omar.service.ServiceFactory;
-import com.omar.service.VueloService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
@@ -18,17 +13,10 @@ import java.util.List;
 public class SeleccionVueloFrame extends JFrame {
     private JTable tablaVuelos;
     private DefaultTableModel modeloTabla;
-    private List<Vuelo> vuelos;
-    private final AeropuertoService aeropuertoService;
-    private final VueloService vueloService;
-    private final Connection connection;
+    private final List<Vuelo> vuelos;
 
-    public SeleccionVueloFrame(List<Vuelo> vuelos) throws SQLException {
+    public SeleccionVueloFrame(List<Vuelo> vuelos) {
         this.vuelos = vuelos;
-        ServiceFactory serviceFactory = ServiceFactory.getInstance();
-        this.connection = BD.getInstance().getConnection();
-        this.aeropuertoService = serviceFactory.getAeropuertoService();
-        this.vueloService = serviceFactory.getVueloService();
         setTitle("Selección de Vuelo");
         initComponents();
         cargarVuelos();
@@ -58,14 +46,14 @@ public class SeleccionVueloFrame extends JFrame {
         JButton btnSeleccionar = new JButton("Seleccionar Vuelo");
         JButton btnVolver = new JButton("Volver");
 
-        btnSeleccionar.addActionListener(e -> {
+        btnSeleccionar.addActionListener(_ -> {
             try {
                 seleccionarVuelo();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
         });
-        btnVolver.addActionListener(e -> {
+        btnVolver.addActionListener(_ -> {
             try {
                 volver();
             } catch (Exception ex) {

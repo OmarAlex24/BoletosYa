@@ -1,6 +1,5 @@
 package com.omar.swing;
 
-import com.google.protobuf.ServiceException;
 import com.omar.entity.Aeropuerto;
 import com.omar.entity.Vuelo;
 import com.omar.service.AeropuertoService;
@@ -9,8 +8,6 @@ import com.omar.service.VueloService;
 import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -22,12 +19,11 @@ public class BusquedaVueloFrame extends JFrame {
     private JDateChooser dateChooser;
     private final List<Aeropuerto> todosAeropuertos;
 
-    private final AeropuertoService aeropuertoService;
     private final VueloService vueloService;
 
     public BusquedaVueloFrame() throws Exception {
         ServiceFactory serviceFactory = ServiceFactory.getInstance();
-        this.aeropuertoService = serviceFactory.getAeropuertoService();
+        AeropuertoService aeropuertoService = serviceFactory.getAeropuertoService();
         this.vueloService = serviceFactory.getVueloService();
         this.todosAeropuertos = aeropuertoService.listarTodos();
         setTitle("Búsqueda de Vuelos");

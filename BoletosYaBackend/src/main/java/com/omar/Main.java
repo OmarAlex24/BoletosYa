@@ -2,13 +2,9 @@ package com.omar;
 
 import com.omar.DAO.ClienteDAO;
 import com.omar.entity.Cliente;
-import com.omar.service.ClienteService;
 import com.omar.service.ServiceFactory;
-import com.omar.swing.BusquedaVueloFrame;
-
 import javax.swing.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main{
@@ -39,7 +35,7 @@ public class Main{
         }
 
         SwingUtilities.invokeLater(() -> {
-            LoginForm loginForm = null;
+            LoginForm loginForm;
             try {
                 loginForm = new LoginForm();
             } catch (SQLException e) {

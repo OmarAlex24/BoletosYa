@@ -5,7 +5,6 @@ import com.omar.entity.Vuelo;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.sql.SQLException;
 
 public class SeleccionAsientoFrame extends JFrame {
     private JPanel panelAsientos;
